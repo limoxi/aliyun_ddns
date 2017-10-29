@@ -102,7 +102,7 @@ def get_lastest_local_ip():
 	"""
 	获取最近一次保存在本地的ip
 	"""
-	print u'ip本地存储路径', LOCAL_FILE
+	print 'ip local path', LOCAL_FILE
 	with open(LOCAL_FILE, 'w+') as f:
 		last_ip = f.readline()
 	return last_ip
@@ -110,13 +110,13 @@ def get_lastest_local_ip():
 if __name__ == '__main__':
 	ip = get_curr_ip()
 	if not ip:
-		print u'获取ip失败，请稍后重试~'
+		print 'get ip failed'
 	else:
 		last_ip = get_lastest_local_ip()
 		print ip, last_ip
 		if ip != last_ip:
-			print u'先写到本地...'
+			print 'save ip to {}...'.format(LOCAL_FILE)
 			with open(LOCAL_FILE, 'wb') as f:
 				f.write(ip)
-			print u'修改云解析...'
+			print 'update remote record...'
 			update_yun(ip)
