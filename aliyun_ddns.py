@@ -65,9 +65,13 @@ def update_yun(ip):
 		settings = json.loads(f.read())
 
 	#首先获取解析列表
+	domain = settings['domain']
+	rootDomain = domain[domain.find('.') + 1 :]
+	prefixDomain = domain[: domain.find('.')]
+	print 'root domain is ' + rootDomain + ', prefix domain is ' + prefixDomain
 	get_params = get_signed_params('GET', {
 		'Action': 'DescribeDomainRecords',
-		'DomainName': settings['domain'],
+		'DomainName': rootDomain,
 		'TypeKeyWord': 'A'
 	}, settings)
 
@@ -77,6 +81,8 @@ def update_yun(ip):
 	print 'get_records============'
 	print records
 	for record in records['DomainRecords']['Record']:
+		if record['RR'] != prefixDomain:
+			continue
 		post_params = get_signed_params('POST', {
 			'Action': 'UpdateDomainRecord',
 			'RecordId': record['RecordId'],
