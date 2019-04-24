@@ -96,7 +96,7 @@ def get_curr_ip():
 	}
 	resp = requests.get('http://www.baidu.com/s?word=ip&_t={}'.format(int(time.time()), headers=headers))
 	soup = BS(resp.content, 'html.parser')
-	return soup.select('#1')[0]['fk']
+	return soup.select('.c-gap-right')[0].string.split()[1]
 
 def get_lastest_local_ip():
 	"""
