@@ -9,7 +9,6 @@ from datetime import datetime
 import urllib
 import hashlib
 import hmac
-import time
 
 from bs4 import BeautifulSoup as BS
 
@@ -94,9 +93,12 @@ def get_curr_ip():
 		'content-type': 'text/html',
 		'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100101 Firefox/22.0'
 	}
-	resp = requests.get('http://www.baidu.com/s?word=ip&_t={}'.format(int(time.time()), headers=headers))
+	resp = requests.get('https://www.ip.cn/', headers=headers)
 	soup = BS(resp.content, 'html.parser')
-	return soup.select('.c-gap-right')[0].string.split()[1]
+	for t in soup.find_all('code'):
+		if re.search(r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", t.string):
+			return t.string
+	return ''
 
 def get_lastest_local_ip():
 	"""
