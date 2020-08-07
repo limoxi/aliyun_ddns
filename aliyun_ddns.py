@@ -89,16 +89,10 @@ def update_yun(ip):
 		print result
 
 def get_curr_ip():
-	headers = {
-		'content-type': 'text/html',
-		'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100101 Firefox/22.0'
-	}
-	resp = requests.get('https://www.ip.cn/', headers=headers)
-	soup = BS(resp.content, 'html.parser')
-	for t in soup.find_all('code'):
-		if re.search(r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", t.string):
-			return t.string
-	return ''
+	url = urllib.urlopen("http://txt.go.sohu.com/ip/soip")
+	text = url.read()
+	ip = re.findall(r'\d+.\d+.\d+.\d+', text)
+	return ip[0]
 
 def get_lastest_local_ip():
 	"""
