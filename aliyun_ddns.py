@@ -94,9 +94,8 @@ def get_curr_ip():
 		'content-type': 'text/html',
 		'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100101 Firefox/22.0'
 	}
-	resp = requests.get('http://www.baidu.com/s?word=ip&_t={}'.format(int(time.time()), headers=headers))
-	soup = BS(resp.content, 'html.parser')
-	return soup.select('.c-gap-right')[0].string.split()[1]
+	resp = requests.get('https://www.ip.cn/api/index?ip=&type=0&_t={}'.format(int(time.time()), headers=headers))
+	return json.loads(resp.content)['ip']
 
 def get_lastest_local_ip():
 	"""
