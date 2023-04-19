@@ -14,12 +14,12 @@ def get_curr_ip():
 		'content-type': 'text/html',
 		'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100101 Firefox/22.0'
 	}
-	resp_v4 = requests.get('https://ipv4.ipw.cn/api/ip/&_t={}'.format(int(time.time()), headers=headers))
-	resp_v6 = requests.get('https://ipv6.ipw.cn/api/ipv6/&_t={}'.format(int(time.time()), headers=headers))
+	resp_v4 = requests.get('https://ipv4.lookup.test-ipv6.com/&_t={}'.format(int(time.time()), headers=headers))
+	resp_v6 = requests.get('https://ipv6.lookup.test-ipv6.com/&_t={}'.format(int(time.time()), headers=headers))
 
 	return {
-		'v4': resp_v4.content,
-		'v6': resp_v6.content
+		'v4': str(json.loads(resp_v4.content).get('ip')),
+		'v6': str(json.loads(resp_v6.content).get('ip'))
 	}
 
 def get_lastest_local_ip():
