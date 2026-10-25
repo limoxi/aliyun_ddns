@@ -22,13 +22,13 @@
 3. 首先在阿里云解析中新增域名的解析记录 (重要！！！因为本脚本只是修改，所以前提得有可修改的解析记录！！！)
 
 ### 脚本依赖
-1. python环境 (安装python2.7, 不支持python3)
+1. python环境 (python3.12)
 2. pip install requests
 
 ### 使用说明
 1. 修改aliyun_settings.json中的access_key、access_secret为自己申请的accesskey
 2. 修改aliyun_settings.json中的domain为自己要解析的域名，比如 "baidu.com''
-3. 定时执行 python aliyun_ddns.py   (windows和linux环境下的定时任务就不提了)
+3. 定时执行 python aliyun_ddns.py 4  (只更新ipv4)，python aliyun_ddns.py 6 (只更新ipv6)，python aliyun_ddns.py 4 6 (两者都更新，不传参数时默认也是两者都更新)   (windows和linux环境下的定时任务就不提了)
 4. 最新的ip会保存在同级目录的ip.txt中，方便查看
 5. 脚本的执行步骤有print日志，如有问题，先分析下输出内容
 

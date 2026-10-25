@@ -1,12 +1,14 @@
-# coding: utf8
+# coding: utf-8
+import base64
 import hashlib
 import hmac
 import json
 import os
-import urllib
 import uuid
+from datetime import datetime, timezone
+from urllib.parse import quote_plus, urlencode
+
 import requests
-from datetime import datetime
 
 REQUEST_URL = 'https://alidns.aliyuncs.com/'
 ALIYUN_SETTINGS = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'aliyun_settings.json')
@@ -22,9 +24,9 @@ def get_common_params(settings):
 		'Version': '2015-01-09',
 		'AccessKeyId': settings['access_key'],
 		'SignatureMethod': 'HMAC-SHA1',
-		'Timestamp': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
+		'Timestamp': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
 		'SignatureVersion': '1.0',
-		'SignatureNonce': uuid.uuid4()
+		'SignatureNonce': str(uuid.uuid4())
 	}
 
 def get_signed_params(http_method, params, settings):
@@ -37,11 +39,16 @@ def get_signed_params(http_method, params, settings):
 	# 2、按照参数的字典顺序排序
 	sorted_params = sorted(params.items())
 	# 3、encode 参数
-	query_params = urllib.urlencode(sorted_params)
+	query_params = urlencode(sorted_params)
 	# 4、构造需要签名的字符串
-	str_to_sign = http_method + "&" + urllib.quote_plus("/") + "&" + urllib.quote_plus(query_params)
+	str_to_sign = http_method + "&" + quote_plus("/") + "&" + quote_plus(query_params)
 	# 5、计算签名
-	signature = hmac.new(str(settings['access_secret'] + '&'), str(str_to_sign), hashlib.sha1).digest().encode('base64').strip('\n') #此处注意，必须用str转换，因为hmac不接受unicode，大坑！！！
+	signature = hmac.new(
+		(settings['access_secret'] + '&').encode('utf-8'),
+		str_to_sign.encode('utf-8'),
+		hashlib.sha1
+	).digest()
+	signature = base64.b64encode(signature).decode('utf-8')
 	# 6、将签名加入参数中
 	params['Signature'] = signature
 
@@ -54,7 +61,7 @@ def update_yun(ipv4='', ipv6=''):
 		获取解析记录：https://help.aliyun.com/document_detail/29776.html?spm=5176.doc29774.6.618.fkB0qE
 		修改解析记录：https://help.aliyun.com/document_detail/29774.html?spm=5176.doc29774.6.616.qFehCg
 	"""
-	with open(ALIYUN_SETTINGS, 'r') as f:
+	with open(ALIYUN_SETTINGS, 'r', encoding='utf-8') as f:
 		settings = json.loads(f.read())
 
 	if ipv4 != '':
@@ -71,7 +78,7 @@ def update_yun(ipv4='', ipv6=''):
 		'TypeKeyWord': update_type
 	}, settings)
 
-	get_resp = requests.get(REQUEST_URL, get_params)
+	get_resp = requests.get(REQUEST_URL, params=get_params, timeout=30)
 
 	records = get_resp.json()
 	print('get_records============')
@@ -84,7 +91,7 @@ def update_yun(ipv4='', ipv6=''):
 			'Type': record['Type'],
 			'Value': update_value
 		}, settings)
-		post_resp = requests.post(REQUEST_URL, post_params)
+		post_resp = requests.post(REQUEST_URL, data=post_params, timeout=30)
 		result = post_resp.json()
 		print('update_record============')
 		print(result)
